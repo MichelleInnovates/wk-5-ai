@@ -1,0 +1,24 @@
+Part 3: Critical Thinking (20 points)
+Ethics & Bias (10 points)
+How Bias Affects Outcomes: Biased data can have devastating effects. For example, if the training data includes a "has_transportation" feature, and historically, low-income patients (who are less likely to have a car) were readmitted more often, the model might learn that "no_transportation" is a high-risk feature. This is a proxy for socioeconomic status.
+
+This could lead to resource misallocation. Instead of identifying the root cause (a need for transport to a follow-up), the model just flags the patient as "high risk." Clinicians might apply standard interventions (like a follow-up call) that don't address the real problem, and the patient is readmitted anyway. The model thus fails the patient while appearing to be "correctly" risk-stratifying. This reinforces and amplifies existing health disparities.
+
+Mitigation Strategy:
+
+Auditing and Fairness-Aware Modeling: First, we must audit the model's performance (e.g., its False Negative Rate) across different demographic subgroups (e.g., race, gender, zip code). If we find that the model performs worse for one group, we can apply a mitigation strategy. One such strategy is re-weighting. During training, we would give a higher weight to data points from the under-represented or poorly-served group, forcing the model to "pay more attention" to getting its predictions right for that group, thereby balancing the error rates.
+
+Trade-offs (10 points)
+Interpretability vs. Accuracy (Healthcare):
+
+In healthcare, there is a strong trade-off between a "black box" model and an interpretable one. A complex deep neural network might achieve 90% accuracy, while a simple, interpretable Logistic Regression model achieves 88%.
+
+A doctor will almost always choose the 88% accurate interpretable model. Why? Because a doctor needs to trust the recommendation and act on it. The black box model just says "High Risk." The interpretable model says "High Risk because of diabetes, 2+ prior admissions, and age." This "why" gives the doctor actionable, verifiable information. They can trust the model because its reasoning aligns with their own clinical judgment. The 2% accuracy gain from the black box is not worth the loss of trust, explainability, and actionability.
+
+Limited Computational Resources:
+
+If the hospital has limited computational resources (e.g., no high-powered GPUs, basic on-premise servers), this severely impacts model choice.
+
+Complex models are infeasible. This would rule out Deep Learning (neural networks) and large ensemble models (like an XGBoost or Random Forest with thousands of trees), which are computationally expensive to train and, in some cases, to run.
+
+This limitation strongly favors simple, computationally light models. We would be pushed toward Logistic Regression, Naive Bayes, or a single, pruned Decision Tree. These models can be trained and run efficiently on standard CPUs, making them a practical and realistic choice for a resource-constrained environment.

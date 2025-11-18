@@ -1,0 +1,80 @@
+Part 1: Short Answer Questions (30 points)
+1. Problem Definition (6 points)
+Hypothetical AI Problem: Predicting student dropout rates at a four-year university.
+
+3 Objectives:
+
+Identify at-risk students before they disengage or drop out.
+
+Enable proactive intervention by academic advisors.
+
+Improve the university's overall retention and graduation rates.
+
+2 Stakeholders:
+
+University Administration (Deans, Registrars): Responsible for retention goals and institutional success.
+
+Academic Advisors/Faculty: Responsible for student support and intervention.
+
+1 Key Performance Indicator (KPI):
+
+Recall (or Sensitivity): The percentage of students who actually dropped out that the model correctly flagged as "at-risk." This KPI is crucial because the primary goal is to find at-risk students, making a false negative (missing a student) the worst-case error.
+
+2. Data Collection & Preprocessing (8 points)
+2 Data Sources:
+
+Student Information System (SIS): Contains demographic data (age, home zip code), financial aid status, high school GPA, and academic records (course enrollment, declared major, current grades).
+
+Learning Management System (LMS) (e.g., Canvas, Moodle): Contains engagement data (login frequency, assignment submission times, forum participation, time spent on course materials).
+
+1 Potential Bias:
+
+Socioeconomic Bias: Data from the LMS might be biased against students with fewer resources. For example, a student who works full-time or has poor internet access may have lower "engagement" metrics (like login frequency), which the model could misinterpret as a lack of academic commitment rather than a lack of resources. This could cause the model to unfairly flag low-income students.
+
+3 Preprocessing Steps:
+
+Missing Value Imputation: Handle missing grades or demographic data. For example, a missing grade could be imputed with the class median or a flag "not_submitted" could be created.
+
+Feature Engineering: Create new predictive features. For instance, calculate a 'grade trend' (the slope of a student's grades over the last two semesters) or an 'LMS engagement score' (a composite of logins and submissions).
+
+Normalization/Scaling: Scale continuous features (like 'age', 'GPA', 'LMS_logins') to a common range (e.g., 0-1) using Min-Max Scaling, ensuring that no single feature dominates the model due to its scale.
+
+3. Model Development (8 points)
+Model Choice & Justification:
+
+Model: Random Forest.
+
+Justification: This problem uses diverse tabular data (grades, demographics, logs). Random Forest is excellent at handling a mix of numerical and categorical features, is robust to outliers, and is less prone to overfitting than a single decision tree. Critically, it provides feature importance, which allows advisors to see why a student was flagged (e.g., "low LMS engagement" and "dropping grades"), making the prediction actionable.
+
+Data Split:
+
+I would split the data into three sets using a stratified split (to ensure the same percentage of 'dropout' students is in each set):
+
+Training Set (70%): Used to train the model's parameters.
+
+Validation Set (15%): Used to tune hyperparameters and select the best-performing model.
+
+Test Set (15%): Held back until the very end. Used only once to provide an unbiased estimate of the final model's performance on unseen data.
+
+2 Hyperparameters to Tune:
+
+n_estimators: The number of trees in the forest. Tuning this helps balance bias and variance; too few trees may underfit, while too many add computational cost for diminishing returns.
+
+max_depth: The maximum depth of each tree. This is a primary way to control overfitting. A deeper tree can memorize noise, while a shallower tree might not capture complex patterns.
+
+4. Evaluation & Deployment (8 points)
+2 Evaluation Metrics:
+
+Recall (Sensitivity): (True Positives / (True Positives + False Negatives)). As mentioned, this is the most critical metric. We must find the students who are truly at risk.
+
+Precision: (True Positives / (True Positives + False Positives)). This is important for resource allocation. If precision is too low, advisors will be flooded with false positives, leading to "alert fatigue" and a waste of intervention resources.
+
+Concept Drift:
+
+Definition: Concept drift is when the statistical properties of the data (input features or the target variable) change over time, causing a model trained on historical data to become less accurate. For example, a new university-wide mental health initiative (a "new concept") might change the factors that lead to dropping out, making the old model obsolete.
+
+Monitoring: I would schedule the model to be re-evaluated monthly on the newest batch of student data. By tracking its Recall and Precision over time, we can detect performance degradation. If performance drops below a set threshold (e.g., Recall drops 10%), an alert is triggered to retrain the model on more recent data.
+
+1 Technical Deployment Challenge:
+
+Data Pipeline Latency: The system must be fast enough to be useful. This involves a complex technical challenge: building a reliable data pipeline that streams (or batch-processes) data from the SIS and LMS, feeds it to the model, and gets the prediction (the risk score) onto an advisor's dashboard in a timely manner (e.g., updated daily) so they can act before it's too late.
